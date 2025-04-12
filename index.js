@@ -4,14 +4,18 @@ const mortgageAmount = document.querySelector("#mortgage-amount");
 const mortgageTerm = document.querySelector("#mortgage-term");
 const interestRate = document.querySelector("#interest-rate");
 const radioButtons = document.querySelectorAll('input[name="mortgage-type"]');
+
 if (localStorage.getItem("Mortgage form data")) {
   const mortgageData = JSON.parse(localStorage.getItem("Mortgage form data"));
   mortgageAmount.value = mortgageData["mortgage amount"] || "";
   interestRate.value = mortgageData["Interest rate"] || "";
   mortgageTerm.value = mortgageData["mortgage Term"] || "";
-  Array.from(radioButtons).find(
+  const selectRadio = Array.from(radioButtons).find(
     (btn) => btn.id === mortgageData.selectedRadio
-  ).checked = true;
+  );
+  if(selectRadio){
+    selectRadio.checked = true
+  }
 }
 
 function isValidNumber(input) {
@@ -28,6 +32,7 @@ clear.addEventListener("click", () => {
   });
   localStorage.removeItem("Mortgage form data")
 });
+
 radioButtons.forEach((radio) => {
   radio.addEventListener("change", () => {
     const selectedRadio = document.querySelector(
