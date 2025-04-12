@@ -4,20 +4,30 @@ const mortgageAmount = document.querySelector("#mortgage-amount");
 const mortgageTerm = document.querySelector("#mortgage-term");
 const interestRate = document.querySelector("#interest-rate");
 const radioButtons = document.querySelectorAll('input[name="mortgage-type"]');
+if (localStorage.getItem("Mortgage form data")) {
+  const mortgageData = JSON.parse(localStorage.getItem("Mortgage form data"));
+  mortgageAmount.value = mortgageData["mortgage amount"] || "";
+  interestRate.value = mortgageData["Interest rate"] || "";
+  mortgageTerm.value = mortgageData["mortgage Term"] || "";
+  Array.from(radioButtons).find(
+    (btn) => btn.id === mortgageData.selectedRadio
+  ).checked = true;
+}
 
 function isValidNumber(input) {
   return input.value && !isNaN(input.value);
 }
 
-clear.addEventListener("click", ()=>{
-    mortgageTerm.value = "";
-    mortgageAmount.value = "";
-    interestRate.value = "";
+clear.addEventListener("click", () => {
+  mortgageTerm.value = "";
+  mortgageAmount.value = "";
+  interestRate.value = "";
 
-    radioButtons.forEach((radio)=>{
-        radio.checked = false;
-    })
-})
+  radioButtons.forEach((radio) => {
+    radio.checked = false;
+  });
+  localStorage.removeItem("Mortgage form data")
+});
 radioButtons.forEach((radio) => {
   radio.addEventListener("change", () => {
     const selectedRadio = document.querySelector(
@@ -54,11 +64,6 @@ const clearSingleError = (input) => {
   if (errorDiv) errorDiv.classList.remove("error-div");
   if (errorSymbol) errorSymbol.classList.remove("error-symbol");
 };
-
-
-mortgageAmount.addEventListener("change", (e) => {
- console.log(replace(e.target))
-});
 
 submitBtn.addEventListener("click", (e) => {
   e.preventDefault();
@@ -100,6 +105,9 @@ submitBtn.addEventListener("click", (e) => {
     });
 
     if (isValid) {
+      const checkedRadio = Array.from(radioButtons).find(
+        (btn) => btn.checked === true
+      );
       const mortgageAmountValue = parseFloat(mortgageAmount.value);
       const interestRateValue = parseFloat(interestRate.value);
       const mortgageTermValue = parseInt(mortgageTerm.value);
@@ -116,6 +124,15 @@ submitBtn.addEventListener("click", (e) => {
 
       const totalRepayment = monthlyPayment * totalPayments;
 
+      localStorage.setItem(
+        "Mortgage form data",
+        JSON.stringify({
+          "mortgage amount": mortgageAmountValue,
+          "Interest rate": interestRateValue,
+          "mortgage Term": mortgageTermValue,
+          selectedRadio: checkedRadio.id,
+        })
+      );
       document.querySelector(".empty-result-div").style.display = "none";
       document.querySelector(".completed-results-div").style.display = "flex";
       document.querySelector(".result").classList.add("completed");
